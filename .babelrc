@@ -1,0 +1,5 @@
+{
+  "only": ["./vue", "./index.js"],
+  "ignore": ["vue-ctk-date-time-picker", "**/vue-ctk-date-time-picker.common.js"],
+  "compact": false
+}
