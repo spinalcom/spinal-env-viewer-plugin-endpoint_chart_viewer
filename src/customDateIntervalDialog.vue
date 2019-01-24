@@ -66,13 +66,10 @@ with this file. If not, see
 </template>
 
 <script>
-import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
+// import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
 
 export default {
   name: "customDateIntervalDialog",
-  components: {
-    VueCtkDateTimePicker
-  },
   props: ["isOpen"],
   data() {
     const today = new Date();
@@ -137,4 +134,3 @@ export default {
   text-align: center;
 }
 </style>
-<style src="../css/vue-ctk-date-time-picker.css"></style>

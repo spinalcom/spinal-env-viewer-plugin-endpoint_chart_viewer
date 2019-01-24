@@ -24,7 +24,7 @@
 import {FileSystem} from "spinal-core-connectorjs_type";
 import {SpinalGraphService} from "spinal-env-viewer-graph-service";
 
-import {asyncGenToArray} from "../asyncGenToArray/asyncGenToArray";
+import {asyncGenToArray} from "./asyncGenToArray/asyncGenToArray";
 
 import BtnMapDate from "./BtnMappingDate";
 import {spinalServiceTimeseries} from "./timeseriesServiceInstance.js";

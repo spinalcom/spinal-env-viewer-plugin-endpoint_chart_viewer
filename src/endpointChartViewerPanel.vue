@@ -144,7 +144,7 @@ export default {
   height: calc(100% - 36px);
 }
 .raise-disable {
-  color: #3a3a3a;
+  color: #3a3a3a !important;
   background-color: #a6a6a7;
 }
 .endpoint-chart-viewer-panel .md-content {

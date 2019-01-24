@@ -30,7 +30,7 @@ const {
 } = require("spinal-env-viewer-panel-manager-service_spinalforgeextention");
 
 import Vue from "vue";
-import aVueCompoment from "./vue/endpointChartViewerPanel.vue";
+import aVueCompoment from "./endpointChartViewerPanel.vue";
 const {
   spinalContextMenuService,
   SpinalContextApp
