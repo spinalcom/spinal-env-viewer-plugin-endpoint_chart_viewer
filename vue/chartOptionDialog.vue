@@ -6,12 +6,14 @@
              :md-closed=onClose>
     <md-dialog-title>Chart Preferences</md-dialog-title>
     <md-dialog-content class="md-scrollbar">
-      <div class="md-layout">
-        <div class="md-layout-item endpoint-chart-viewer-panel-dialog-chart-option-container">
+      <div>
+        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container-slider">
           <md-checkbox true-value="true"
                        false-value="false"
                        v-tooltip="'you may need to resize the panel.'"
                        v-model="rangeSlider">Use range slider</md-checkbox>
+        </div>
+        <div :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container': showLegendComputed}">
           <md-checkbox true-value="true"
                        false-value="false"
                        v-model="showLegendComputed">Show Legend</md-checkbox>
@@ -210,5 +212,8 @@ export default {
   padding: 0 10px;
   margin-right: 10px;
   margin-bottom: 10px;
+}
+.endpoint-chart-viewer-panel-dialog-chart-option-container-slider {
+  border: 1px solid #a6a6a7;
 }
 </style>
