@@ -58,7 +58,7 @@ SpinalForgeExtention.registerExtention("endpoint_chart_viewer",
 
 class EndpointChartViewerBtn extends SpinalContextApp {
   constructor() {
-    super("Endpoint char viewer",
+    super("Endpoint chart viewer",
       "open a panel with to show the value of the Endpoint", {
         icon: "show_chart",
         icon_type: "in",
