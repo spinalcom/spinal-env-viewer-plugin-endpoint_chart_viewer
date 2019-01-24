@@ -36,7 +36,7 @@ with this file. If not, see
                        false-value="false"
                        v-tooltip="'you may need to resize the panel.'"
                        v-model="rangeSlider">Use range slider</md-checkbox>
-          <div>
+          <div v-if="rangeSlider">
             <em>If the pannel is too small the range slider may not showup.</em>
           </div>
         </div>
