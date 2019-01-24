@@ -147,4 +147,7 @@ export default {
   color: #3a3a3a;
   background-color: #a6a6a7;
 }
+.endpoint-chart-viewer-panel .md-content {
+  background-color: rgba(66, 66, 66,0.4);
+}
 </style>
