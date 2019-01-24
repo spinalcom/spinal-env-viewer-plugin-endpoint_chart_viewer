@@ -10,6 +10,10 @@
         <div class="md-layout-item endpoint-chart-viewer-panel-dialog-chart-option-container">
           <md-checkbox true-value="true"
                        false-value="false"
+                       v-tooltip="'you may need to resize the panel.'"
+                       v-model="rangeSlider">Use range slider</md-checkbox>
+          <md-checkbox true-value="true"
+                       false-value="false"
                        v-model="showLegendComputed">Show Legend</md-checkbox>
           <div v-if="showLegendComputed"
                class="endpoint-chart-viewer-panel-dialog-chart-option-container-legend">
@@ -19,11 +23,6 @@
               <md-radio v-model="orientation"
                         value="v">Vertical</md-radio>
             </div>
-            <md-checkbox true-value="true"
-                         false-value="false"
-                         v-tooltip="'you may need to resize the panel.'"
-                         v-model="rangeSlider">Use range slider</md-checkbox>
-
             <div :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container-legend-subcontainer': position}">
               <md-checkbox true-value="true"
                            false-value="false"
