@@ -23,224 +23,128 @@ with this file. If not, see
 -->
 
 <template>
-  <md-dialog class="endpoint-chart-viewer-panel-dialog-chart-option"
-             :md-active.sync="isOpenComputed"
-             :md-close-on-esc=true
-             :md-click-outside-to-close=true
-             :md-closed=onClose>
-    <md-dialog-title>Chart Preferences</md-dialog-title>
-    <md-dialog-content class="md-scrollbar">
-      <div>
-        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container">
-          <md-checkbox true-value="true"
-                       false-value="false"
-                       v-tooltip="'you may need to resize the panel.'"
-                       v-model="rangeSlider">Use range slider</md-checkbox>
-          <div v-if="rangeSlider">
-            <em>If the pannel is too small the range slider may not showup.</em>
-          </div>
-        </div>
-        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container"
-             :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container-border': showLegendComputed}">
-          <md-checkbox true-value="true"
-                       false-value="false"
-                       v-model="showLegendComputed">Show Legend</md-checkbox>
-          <div v-if="showLegendComputed"
-               class="endpoint-chart-viewer-panel-dialog-chart-option-container-legend">
-            <div>
-              <md-radio v-model="orientation"
-                        value="h">Horizontal</md-radio>
-              <md-radio v-model="orientation"
-                        value="v">Vertical</md-radio>
-            </div>
-            <div :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container-legend-subcontainer': position}">
-              <md-checkbox true-value="true"
-                           false-value="false"
-                           v-model="position">Override default Position</md-checkbox>
-              <div v-if="position">
-                <hr>
-                <div>
-                  <md-radio v-model="positionX"
-                            value="0">left</md-radio>
-                  <md-radio v-model="positionX"
-                            value="0.5">center</md-radio>
-                  <md-radio v-model="positionX"
-                            value="1">right</md-radio>
-                </div>
-                <hr>
-                <div>
-                  <md-radio v-model="positionY"
-                            value="1">top</md-radio>
-                  <md-radio v-model="positionY"
-                            value="0.5">middle</md-radio>
-                  <md-radio v-model="positionY"
-                            value="0">bottom</md-radio>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </md-dialog-content>
-    <md-dialog-actions>
-      <md-button class="md-primary"
-                 @click="closeDialog">Close</md-button>
-    </md-dialog-actions>
-  </md-dialog>
-</template>
+  <div class="endpoint-chart-viewer-panel">
+    <div class="md-layout endpoint-chart-viewer-panel-topbtn-container">
+      <md-button v-for="value in buttons"
+                 :key="value"
+                 class="md-layout-item topbtn"
+                 :disabled="value === btnSelected"
+                 :class="{'raise-disable': value === btnSelected}"
+                 @click="onClick(value)">{{value}}</md-button>
+      <md-button class="md-layout-item topbtn"
+                 :disabled="value === btnSelected"
+                 :class="{'raise-disable': 'CUSTOM' === btnSelected}"
+                 @click="onClickCustom">CUSTOM</md-button>
 
+    </div>
+    <div class="md-layout md-alignment-center-center endpoint-chart-viewer-panel-chart-container">
+      <plotlyCompoment :chartData="timeSeriesData"></plotlyCompoment>
+    </div>
+    <customDateIntervalDialog @closeDialog="closeDialogCustom"
+                              :isOpen="isDialogCustomOpen"></customDateIntervalDialog>
+  </div>
+</template>
 <script>
+import plotlyCompoment from "./plotlyCompoment.vue";
+import { ChartDataEndpoint } from "./ChartDataEndpoint.js";
+import customDateIntervalDialog from "./customDateIntervalDialog.vue";
 export default {
-  name: "chartOptionDialog",
+  name: "my_compo",
+  components: {
+    plotlyCompoment,
+    customDateIntervalDialog
+  },
   data() {
     return {
-      something: true
+      isDialogCustomOpen: false,
+      btnSelected: "1h",
+      buttons: ["1h", "3h", "24h", "J-1", "3J", "7J"],
+      timeSeriesData: []
     };
   },
-  props: ["isOpen", "layoutOption"],
-  computed: {
-    isOpenComputed: {
-      get() {
-        return this.isOpen;
-      },
-      set(value) {
-        if (value === false) {
-          this.onClose();
-        }
-      }
-    },
-    showLegendComputed: {
-      get() {
-        return this.layoutOption.showlegend;
-      },
-      set(value) {
-        this.$emit("updateOptions", { showlegend: value });
-      }
-    },
-    orientation: {
-      get() {
-        return this.layoutOption.legend.orientation;
-      },
-      set(value) {
-        this.$emit("updateOptions", { legend: { orientation: value } });
-      }
-    },
-    position: {
-      get() {
-        if (
-          this.layoutOption.legend.x === null ||
-          this.layoutOption.legend.y === null
-        ) {
-          return false;
-        }
-        return true;
-      },
-      set(value) {
-        if (value === true) {
-          this.$emit("updateOptions", this.getOptionPosition(0, 1));
-        } else {
-          this.$emit("updateOptions", {
-            legend: {
-              x: null,
-              y: null,
-              xanchor: "auto",
-              yanchor: "auto"
-            }
-          });
-        }
-      }
-    },
-    positionX: {
-      get() {
-        return this.layoutOption.legend.x.toString();
-      },
-      set(value) {
-        let x = value,
-          y = this.layoutOption.legend.y;
-        if (this.layoutOption.legend.y === null) y = 0;
-        this.$emit("updateOptions", this.getOptionPosition(x, y));
-      }
-    },
-    positionY: {
-      get() {
-        return this.layoutOption.legend.y.toString();
-      },
-      set(value) {
-        let x = this.layoutOption.legend.x,
-          y = value;
-        if (this.layoutOption.legend.x === null) x = 0;
-        this.$emit("updateOptions", this.getOptionPosition(x, y));
-      }
-    },
-    rangeSlider: {
-      get() {
-        if (this.layoutOption.xaxis.rangeslider === null) return false;
-        return true;
-      },
-      set(value) {
-        this.$emit("updateOptions", {
-          xaxis: { rangeslider: value ? {} : null }
-        });
-      }
-    }
-  },
   methods: {
-    getOptionPosition(x, y) {
-      return {
-        legend: {
-          x,
-          y,
-          xanchor: this.getAnchorX(x),
-          yanchor: this.getAnchorY(y)
+    async toogleSelect(nodeId) {
+      const index = this.timeSeriesData.findIndex(elem => {
+        return elem.nodeId === nodeId;
+      });
+      if (index === -1) {
+        let data;
+        if (this.btnSelected === "CUSTOM") {
+          data = new ChartDataEndpoint(
+            nodeId,
+            this.btnSelected,
+            this.lastStart,
+            this.lastEnd
+          );
+        } else {
+          data = new ChartDataEndpoint(nodeId, this.btnSelected);
         }
-      };
-    },
-    getAnchorX(val) {
-      switch (val) {
-        case "0":
-          return "left";
-        case "0.5":
-          return "center";
-        case "1":
-          return "right";
-        default:
-          return "auto";
+        await data.init();
+        this.timeSeriesData.push(data);
+      } else {
+        const endpointRemoved = this.timeSeriesData.splice(index, 1);
+        for (let index = 0; index < endpointRemoved.length; index++) {
+          endpointRemoved[index].uninit();
+        }
       }
     },
-    getAnchorY(val) {
-      switch (val) {
-        case "0":
-          return "bottom";
-        case "0.5":
-          return "middle";
-        case "1":
-          return "top";
-        default:
-          return "auto";
+    onClick(value) {
+      this.btnSelected = value;
+      for (let index = 0; index < this.timeSeriesData.length; index++) {
+        this.timeSeriesData[index].changeInterval(value);
       }
     },
-    closeDialog() {
-      this.isOpenComputed = false;
+    onClickCustom() {
+      this.isDialogCustomOpen = true;
     },
-    onClose() {
-      this.$emit("closeDialog");
-    }
+    closeDialogCustom(value) {
+      const { start, end, valid } = value;
+      this.isDialogCustomOpen = false;
+      if (valid) {
+        this.lastStart = start;
+        this.lastEnd = end;
+        this.btnSelected = "CUSTOM";
+        for (let index = 0; index < this.timeSeriesData.length; index++) {
+          this.timeSeriesData[index].changeCustomInterval(start, end);
+        }
+      }
+    },
+    opened(option) {
+      return this.toogleSelect(option.selectedNode.id.get());
+    },
+    removed() {
+      for (let index = 0; index < this.timeSeriesData.length; index++) {
+        this.timeSeriesData[index].uninit();
+      }
+      this.timeSeriesData = [];
+    },
+    closed() {}
   }
 };
 </script>
 
 <style>
-.endpoint-chart-viewer-panel-dialog-chart-option-container {
-  padding: 0 10px;
+.endpoint-chart-viewer-panel {
+  height: 100%;
 }
-.endpoint-chart-viewer-panel-dialog-chart-option-container-legend
-  > .endpoint-chart-viewer-panel-dialog-chart-option-container-legend-subcontainer {
-  border: 1px solid #a6a6a7;
-  padding: 0 10px;
-  margin-bottom: 10px;
+.endpoint-chart-viewer-panel,
+.endpoint-chart-viewer-panel * {
+  box-sizing: border-box;
+}
+.endpoint-chart-viewer-panel .endpoint-chart-viewer-panel-topbtn-container {
+  border-bottom: 1px solid #a6a6a7;
+  max-height: 36px;
 }
 
-.endpoint-chart-viewer-panel-dialog-chart-option-container-border {
-  border: 1px solid #a6a6a7;
+.endpoint-chart-viewer-panel .topbtn {
+  margin: unset;
+  min-width: 3em;
+}
+.endpoint-chart-viewer-panel .endpoint-chart-viewer-panel-chart-container {
+  height: calc(100% - 36px);
+}
+.raise-disable {
+  color: #3a3a3a;
+  background-color: #a6a6a7;
 }
 </style>

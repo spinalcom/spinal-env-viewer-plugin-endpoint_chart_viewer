@@ -1,3 +1,27 @@
+<!--
+Copyright 2018 SpinalCom - www.spinalcom.com
+
+This file is part of SpinalCore.
+
+Please read all of the following terms and conditions
+of the Free Software license Agreement ("Agreement")
+carefully.
+
+This Agreement is a legally binding contract between
+the Licensee (as defined below) and SpinalCom that
+sets forth the terms and conditions that govern your
+use of the Program. By installing and/or using the
+Program, you agree to abide by all the terms and
+conditions stated or referenced herein.
+
+If you do not agree to abide by these terms and
+conditions, do not demonstrate your acceptance and do
+not install or use the Program.
+You should have received a copy of the license along
+with this file. If not, see
+<http://resources.spinalcom.com/licenses.pdf>.
+-->
+
 <template>
   <md-dialog class="endpoint-chart-viewer-panel-dialog-chart-option"
              :md-active.sync="isOpenComputed"
@@ -7,13 +31,17 @@
     <md-dialog-title>Chart Preferences</md-dialog-title>
     <md-dialog-content class="md-scrollbar">
       <div>
-        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container-slider">
+        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container">
           <md-checkbox true-value="true"
                        false-value="false"
                        v-tooltip="'you may need to resize the panel.'"
                        v-model="rangeSlider">Use range slider</md-checkbox>
+          <div v-if="rangeSlider">
+            <em>If the pannel is too small the range slider may not showup.</em>
+          </div>
         </div>
-        <div :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container': showLegendComputed}">
+        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container"
+             :class="{'endpoint-chart-viewer-panel-dialog-chart-option-container-border': showLegendComputed}">
           <md-checkbox true-value="true"
                        false-value="false"
                        v-model="showLegendComputed">Show Legend</md-checkbox>
@@ -32,6 +60,8 @@
               <div v-if="position">
                 <hr>
                 <div>
+                  <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">Vertical
+                    Postion</h5>
                   <md-radio v-model="positionX"
                             value="0">left</md-radio>
                   <md-radio v-model="positionX"
@@ -41,12 +71,40 @@
                 </div>
                 <hr>
                 <div>
+                  <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">Vertical
+                    Anchor Postion</h5>
+                  <md-radio v-model="positionAnchorX"
+                            value="auto">auto</md-radio>
+                  <md-radio v-model="positionAnchorX"
+                            value="left">left</md-radio>
+                  <md-radio v-model="positionAnchorX"
+                            value="center">center</md-radio>
+                  <md-radio v-model="positionAnchorX"
+                            value="right">right</md-radio>
+                </div>
+                <hr>
+                <div>
+                  <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">Horizontal
+                    Postion</h5>
                   <md-radio v-model="positionY"
                             value="1">top</md-radio>
                   <md-radio v-model="positionY"
                             value="0.5">middle</md-radio>
                   <md-radio v-model="positionY"
                             value="0">bottom</md-radio>
+                </div>
+                <hr>
+                <div>
+                  <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">Horizontal
+                    Anchor Postion</h5>
+                  <md-radio v-model="positionAnchorY"
+                            value="auto">auto</md-radio>
+                  <md-radio v-model="positionAnchorY"
+                            value="top">top</md-radio>
+                  <md-radio v-model="positionAnchorY"
+                            value="middle">middle</md-radio>
+                  <md-radio v-model="positionAnchorY"
+                            value="bottom">bottom</md-radio>
                 </div>
               </div>
             </div>
@@ -144,6 +202,30 @@ export default {
         this.$emit("updateOptions", this.getOptionPosition(x, y));
       }
     },
+    positionAnchorX: {
+      get() {
+        return this.layoutOption.legend.xanchor;
+      },
+      set(value) {
+        this.$emit("updateOptions", {
+          legend: {
+            xanchor: value
+          }
+        });
+      }
+    },
+    positionAnchorY: {
+      get() {
+        return this.layoutOption.legend.yanchor;
+      },
+      set(value) {
+        this.$emit("updateOptions", {
+          legend: {
+            yanchor: value
+          }
+        });
+      }
+    },
     rangeSlider: {
       get() {
         if (this.layoutOption.xaxis.rangeslider === null) return false;
@@ -161,35 +243,9 @@ export default {
       return {
         legend: {
           x,
-          y,
-          xanchor: this.getAnchorX(x),
-          yanchor: this.getAnchorY(y)
+          y
         }
       };
-    },
-    getAnchorX(val) {
-      switch (val) {
-        case "0":
-          return "left";
-        case "0.5":
-          return "center";
-        case "1":
-          return "right";
-        default:
-          return "auto";
-      }
-    },
-    getAnchorY(val) {
-      switch (val) {
-        case "0":
-          return "bottom";
-        case "0.5":
-          return "middle";
-        case "1":
-          return "top";
-        default:
-          return "auto";
-      }
     },
     closeDialog() {
       this.isOpenComputed = false;
@@ -203,17 +259,27 @@ export default {
 
 <style>
 .endpoint-chart-viewer-panel-dialog-chart-option-container {
-  border: 1px solid #a6a6a7;
-  padding-left: 10px;
+  padding: 0 10px;
 }
 .endpoint-chart-viewer-panel-dialog-chart-option-container-legend
   > .endpoint-chart-viewer-panel-dialog-chart-option-container-legend-subcontainer {
   border: 1px solid #a6a6a7;
   padding: 0 10px;
-  margin-right: 10px;
   margin-bottom: 10px;
 }
-.endpoint-chart-viewer-panel-dialog-chart-option-container-slider {
+
+.endpoint-chart-viewer-panel-dialog-chart-option-container-border {
   border: 1px solid #a6a6a7;
+}
+.endpoint-chart-viewer-panel-dialog-chart-option-postion-header {
+  margin: unset;
+}
+.endpoint-chart-viewer-panel-dialog-chart-option
+  .md-scrollbar::-webkit-scrollbar {
+  background-color: #121212;
+}
+.endpoint-chart-viewer-panel-dialog-chart-option
+  .md-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #737374;
 }
 </style>

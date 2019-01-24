@@ -85,6 +85,8 @@ export default {
         },
         showlegend: true,
         legend: {
+          xanchor: "auto",
+          yanchor: "auto",
           orientation: "v",
           x: null,
           y: null,
