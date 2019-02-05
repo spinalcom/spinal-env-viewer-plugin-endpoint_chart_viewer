@@ -35,14 +35,18 @@ with this file. If not, see
                     class="chart-data-endpoint-graph-container-empty"
                     md-icon="show_chart"
                     md-label="No Data"
-                    md-description="No data to show in the Endpoint(s) Selected !">
+                    md-description="No data to show in the Endpoint(s) Selected !"
+                    v-tooltip="selectedNames">
     </md-empty-state>
     <md-button class="md-icon-button md-primary md-raised chart-data-endpoint-graph-container-option-button"
+               :class="{autodeskv6: isviewerV6}"
                @click="optionOpen = true">
       <md-icon>settings</md-icon>
     </md-button>
     <chartOptionDialog :isOpen="optionOpen"
                        :layoutOption="this.layout"
+                       :lineMode="lineMode"
+                       @updateLineMode="updateLineMode"
                        @closeDialog="optionOpen = false"
                        @updateOptions="updateOptions"></chartOptionDialog>
   </md-content>
@@ -57,9 +61,11 @@ export default {
   components: { chartOptionDialog },
   data() {
     return {
+      selectedNames: "",
       optionOpen: false,
       isReady: false,
       haveData: false,
+      lineMode: "lines",
       layout: {
         margin: {
           b: 90,
@@ -104,6 +110,11 @@ export default {
     };
   },
   props: ["chartData"],
+  computed: {
+    isviewerV6() {
+      return parseInt(window.LMV_VIEWER_VERSION) === 6;
+    }
+  },
   mounted() {
     this.init();
     this._graph_ = this.createGraph();
@@ -159,6 +170,18 @@ export default {
         responsive: true
       });
     },
+    updateLineMode(lineMode) {
+      this.lineMode = lineMode;
+      for (let idx = 0; idx < this.my_chartData.length; idx++) {
+        const myElement = this.my_chartData[idx];
+        myElement.mode = lineMode;
+      }
+      globalType.Plotly.react(this._graph_.gd, this.my_chartData, this.layout, {
+        modeBarButtonsToRemove: ["sendDataToCloud"],
+        displaylogo: false,
+        responsive: true
+      });
+    },
     updateGraph: function(chartData) {
       for (let index = 0; index < chartData.length; index++) {
         const element = chartData[index];
@@ -179,7 +202,7 @@ export default {
         if (found === false) {
           this.my_chartData.push({
             nodeId: element.nodeId,
-            mode: "lines",
+            mode: this.lineMode,
             type: "scatter",
             name: element.name,
             x: element.x,
@@ -222,6 +245,7 @@ export default {
       }
       this.haveData = false;
       this.isReady = true;
+      this.selectedNames = this.my_chartData.map(e => e.name).join(", ");
     },
 
     createGraph: function() {
@@ -278,5 +302,9 @@ export default {
   bottom: 5px;
   left: 0;
   position: absolute;
+}
+
+.chart-data-endpoint-graph-container-option-button.autodeskv6 {
+  bottom: 24px;
 }
 </style>

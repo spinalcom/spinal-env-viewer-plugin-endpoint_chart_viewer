@@ -37,7 +37,8 @@ with this file. If not, see
                  @click="onClickCustom">CUSTOM</md-button>
 
     </div>
-    <div class="md-layout md-alignment-center-center endpoint-chart-viewer-panel-chart-container">
+    <div class="md-layout md-alignment-center-center endpoint-chart-viewer-panel-chart-container"
+         :class="{autodeskv6: isviewerV6}">
       <plotlyCompoment :chartData="timeSeriesData"></plotlyCompoment>
     </div>
     <customDateIntervalDialog @closeDialog="closeDialogCustom"
@@ -61,6 +62,11 @@ export default {
       buttons: ["1h", "3h", "24h", "J-1", "3J", "7J"],
       timeSeriesData: []
     };
+  },
+  computed: {
+    isviewerV6() {
+      return parseInt(window.LMV_VIEWER_VERSION) === 6;
+    }
   },
   methods: {
     async toogleSelect(nodeId) {
@@ -143,11 +149,16 @@ export default {
 .endpoint-chart-viewer-panel .endpoint-chart-viewer-panel-chart-container {
   height: calc(100% - 36px);
 }
+.endpoint-chart-viewer-panel
+  .endpoint-chart-viewer-panel-chart-container.autodeskv6 {
+  height: calc(100% - 56px);
+}
+
 .raise-disable {
   color: #3a3a3a !important;
   background-color: #a6a6a7;
 }
 .endpoint-chart-viewer-panel .md-content {
-  background-color: rgba(66, 66, 66,0.4);
+  background-color: rgba(66, 66, 66, 0.4);
 }
 </style>

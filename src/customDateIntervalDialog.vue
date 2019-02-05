@@ -126,6 +126,20 @@ export default {
 .endpoint-chart-viewer-panel-dialog-custom-interval {
   width: 80vw;
 }
+.endpoint-chart-viewer-panel-dialog-custom-interval > .md-dialog-container {
+  max-height: 80vh;
+}
+.endpoint-chart-viewer-panel-dialog-custom-interval
+  > .md-dialog-container
+  > .md-dialog-content.md-scrollbar::-webkit-scrollbar {
+  background-color: #121212;
+}
+.endpoint-chart-viewer-panel-dialog-custom-interval
+  > .md-dialog-container
+  > .md-dialog-content.md-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #737374;
+}
+
 .endpoint-chart-viewer-panel-dialog-custom-interval-calendar-container {
   border: 5px double #cbcbcb;
   margin: 20px;

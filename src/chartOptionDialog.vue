@@ -32,6 +32,17 @@ with this file. If not, see
     <md-dialog-content class="md-scrollbar">
       <div>
         <div class="endpoint-chart-viewer-panel-dialog-chart-option-container">
+          <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">
+            Line Mode</h5>
+
+          <md-radio v-model="lineModeComputed"
+                    value="lines">Lines</md-radio>
+          <md-radio v-model="lineModeComputed"
+                    value="markers">Markers</md-radio>
+          <md-radio v-model="lineModeComputed"
+                    value="lines+markers">Lines + Markers</md-radio>
+        </div>
+        <div class="endpoint-chart-viewer-panel-dialog-chart-option-container">
           <md-checkbox true-value="true"
                        false-value="false"
                        v-tooltip="'you may need to resize the panel.'"
@@ -127,8 +138,16 @@ export default {
       something: true
     };
   },
-  props: ["isOpen", "layoutOption"],
+  props: ["isOpen", "layoutOption", "lineMode"],
   computed: {
+    lineModeComputed: {
+      get() {
+        return this.lineMode;
+      },
+      set(value) {
+        this.$emit("updateLineMode", value);
+      }
+    },
     isOpenComputed: {
       get() {
         return this.isOpen;
@@ -258,6 +277,10 @@ export default {
 </script>
 
 <style>
+.endpoint-chart-viewer-panel-dialog-chart-option > .md-dialog-container {
+  max-height: 80vh;
+}
+
 .endpoint-chart-viewer-panel-dialog-chart-option-container {
   padding: 0 10px;
 }
