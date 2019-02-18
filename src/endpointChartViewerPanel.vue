@@ -42,6 +42,7 @@ with this file. If not, see
       <plotlyCompoment :chartData="timeSeriesData"></plotlyCompoment>
     </div>
     <customDateIntervalDialog @closeDialog="closeDialogCustom"
+                              :dateAvailable="dateAvailable"
                               :isOpen="isDialogCustomOpen"></customDateIntervalDialog>
   </div>
 </template>
@@ -49,6 +50,7 @@ with this file. If not, see
 import plotlyCompoment from "./plotlyCompoment.vue";
 import { ChartDataEndpoint } from "./ChartDataEndpoint.js";
 import customDateIntervalDialog from "./customDateIntervalDialog.vue";
+import union from 'lodash.union';
 export default {
   name: "my_compo",
   components: {
@@ -60,7 +62,8 @@ export default {
       isDialogCustomOpen: false,
       btnSelected: "1h",
       buttons: ["1h", "3h", "24h", "J-1", "3J", "7J"],
-      timeSeriesData: []
+      timeSeriesData: [],
+      dateAvailable: []
     };
   },
   computed: {
@@ -93,6 +96,11 @@ export default {
           endpointRemoved[index].uninit();
         }
       }
+      let tmp = this.timeSeriesData.map(e=>e.dateAvailable);
+      tmp = union(...tmp);
+      tmp.sort((a, b) => a - b);
+      this.dateAvailable = tmp;
+
     },
     onClick(value) {
       this.btnSelected = value;

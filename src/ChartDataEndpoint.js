@@ -41,6 +41,7 @@ class ChartDataEndpoint {
     this.updateprom = null;
     this.start = new Date(start);
     this.end = new Date(end);
+    this.dateAvailable = [];
   }
 
   async init() {
@@ -77,13 +78,16 @@ class ChartDataEndpoint {
           this.end
         );
         this.handleTimeseries(generator);
+      } else {
+        const func = BtnMapDate[this.timeIntervalStr];
+        if (func && typeof func[0] === "function") {
+          const timeseriesData = await func[0](timeseries, func[1]);
+          const generator = await asyncGenToArray(timeseriesData);
+          this.handleTimeseries(generator);
+        }
       }
-      const func = BtnMapDate[this.timeIntervalStr];
-      if (func && typeof func[0] === "function") {
-        const timeseriesData = await func[0](timeseries, func[1]);
-        const generator = await asyncGenToArray(timeseriesData);
-        this.handleTimeseries(generator);
-      }
+      const tsArchive = await timeseries.getArchive();
+      this.dateAvailable = tsArchive.getDates().get();
     }
   }
 

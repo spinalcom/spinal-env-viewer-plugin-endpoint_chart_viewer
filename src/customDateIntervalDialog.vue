@@ -29,28 +29,44 @@ with this file. If not, see
              :md-closed=onClose>
     <md-dialog-content class="md-scrollbar">
       <div class="md-layout">
+      </div>
+      <div class="md-layout">
         <div class="md-layout-item endpoint-chart-viewer-panel-dialog-custom-interval-calendar-container">
-          <h2>Start : {{start}}</h2>
-          <VueCtkDateTimePicker :noHeader=true
-                                :max-date="end"
+        <md-field>
+          <label for="start">Start</label>
+          <md-select v-model="startCompu" name="start" id="start">
+            <md-option value="Other">Other</md-option>
+            <md-option
+                     v-for="date in dateAvailableCompu"
+                     :key="date" :value="selectDateStart(date)">{{formatDate(date)}}</md-option>
+          </md-select>
+        </md-field>
+          <VueCtkDateTimePicker :max-date="endPickerCompu"
                                 :dark=true
                                 :hint="hint"
                                 :format="format"
                                 :noButtonNow=false
-                                v-model="start"
+                                v-model="startPickerCompu"
                                 :inline=true>
           </VueCtkDateTimePicker>
         </div>
         <div class="md-layout-item endpoint-chart-viewer-panel-dialog-custom-interval-calendar-container">
-          <h2>End : {{end}}</h2>
-          <VueCtkDateTimePicker :noHeader=true
-                                :max-date="today"
+          <md-field>
+            <label for="end">End</label>
+            <md-select v-model="endCompu" name="end" id="end">
+              <md-option value="Other">Other</md-option>
+              <md-option
+                      v-for="date in dateAvailableCompu"
+                      :key="date" :value="selectDateStart(date)">{{formatDate(date)}}</md-option>
+            </md-select>
+          </md-field>
+          <VueCtkDateTimePicker :max-date="today"
                                 :min-date="endStart"
                                 :dark=true
                                 :hint="hint"
                                 :format="format"
                                 :noButtonNow=false
-                                v-model="end"
+                                v-model="endPickerCompu"
                                 :inline=true>
           </VueCtkDateTimePicker>
         </div>
@@ -60,23 +76,23 @@ with this file. If not, see
       <md-button class="md-primary"
                  @click="closeDialog(false)">Close</md-button>
       <md-button class="md-primary"
+      :disabled="start === null || end === null"
                  @click="closeDialog(true)">Valid</md-button>
     </md-dialog-actions>
   </md-dialog>
 </template>
 
 <script>
-// import VueCtkDateTimePicker from "vue-ctk-date-time-picker";
-
+import moment from 'moment';
 export default {
   name: "customDateIntervalDialog",
-  props: ["isOpen"],
+  props: ["isOpen", "dateAvailable"],
   data() {
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(23, 59, 59);
     return {
       hint: "Select the starting point to show",
-      format: "YYYY-MM-DD HH:mm",
+      format: "YYYY-MM-DD HH:mm:ss",
       today: today.toISOString(),
       start: null,
       end: null,
@@ -84,6 +100,69 @@ export default {
     };
   },
   computed: {
+    startCompu: {
+      get(){
+        if (this.start === null) return 'Other';
+        const data = new Date(this.start.valueOf());
+        data.setUTCHours(0,0,0,0);
+        for (let idx = 0; idx < this.dateAvailableCompu.length; idx++) {
+          const element = this.dateAvailableCompu[idx];
+          if (data.getTime() === element) {
+            return data.toISOString();
+          }
+        }
+        return 'Other';
+      },
+      set(value){
+        if (value === 'Other') return;
+        this.start = moment.utc(value);
+      }
+    },
+    startPickerCompu: {
+      get(){
+        if (this.start === null) {
+          return null;
+        } else {
+          return new Date(this.start).toISOString();
+        }
+      },
+      set(value){
+        this.start= moment.utc(value, 'YYYY-MM-DD HH:mm:ss');
+      }
+    },
+    endCompu: {
+      get(){
+        if (this.end === null) return 'Other';
+        const data = new Date(this.end.valueOf());
+        data.setUTCHours(0.0,0,0);
+        for (let idx = 0; idx < this.dateAvailableCompu.length; idx++) {
+          const element = this.dateAvailableCompu[idx];
+          if (data.getTime() === element) {
+            return this.selectDateStart(data);
+          }
+        }
+        return 'Other';
+      },
+      set(value){
+        if (value === 'Other') return;
+        this.end = moment.utc(value).hours(23).minutes(59).second(59);
+      }
+    },
+    endPickerCompu: {
+      get(){
+        if (this.end === null) {
+          return null;
+        } else {
+          return new Date(this.end).toISOString();
+        }
+      },
+      set(value){
+        this.end = moment.utc(value, 'YYYY-MM-DD HH:mm:ss');
+      }
+    },
+    dateAvailableCompu() {
+      return this.dateAvailable || [];
+    },
     isOpenComputed: {
       get() {
         return this.isOpen;
@@ -97,11 +176,23 @@ export default {
     endStart() {
       if (this.start === null) return null;
       const startDate = new Date(this.start);
-      startDate.setHours(0, 0, 0, 0);
+      startDate.setUTCHours(-1, 0, 0, 0);
       return startDate.toISOString();
     }
   },
   methods: {
+    selectDateStart(date) {
+      let m_date = new Date(date);
+      return new Date(m_date.setUTCHours(0, 0, 0, 0)).toISOString();
+    },
+    selectDateEnd(date) {
+      let m_date = new Date(date);
+      return new Date(m_date.setUTCHours(23, 59, 59, 999)).toISOString();
+
+    },
+    formatDate(date) {
+      return new Date(date).toDateString();
+    },
     closeDialog(valid) {
       this.valid = valid;
       this.isOpenComputed = false;
@@ -147,4 +238,11 @@ export default {
 .endpoint-chart-viewer-panel-dialog-custom-interval-calendar-container > h2 {
   text-align: center;
 }
+.endpoint-chart-viewer-panel-dialog-custom-interval .md-field {
+    padding-left: 8px;
+}
+.endpoint-chart-viewer-panel-dialog-custom-interval .md-field label {
+    padding-left: 8px;
+}
+
 </style>

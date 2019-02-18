@@ -34,7 +34,6 @@ with this file. If not, see
         <div class="endpoint-chart-viewer-panel-dialog-chart-option-container">
           <h5 class="endpoint-chart-viewer-panel-dialog-chart-option-postion-header">
             Line Mode</h5>
-
           <md-radio v-model="lineModeComputed"
                     value="lines">Lines</md-radio>
           <md-radio v-model="lineModeComputed"
