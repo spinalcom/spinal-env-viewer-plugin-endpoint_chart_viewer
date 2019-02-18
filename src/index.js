@@ -36,6 +36,7 @@ const {
   SpinalContextApp
 } = require("spinal-env-viewer-context-menu-service");
 
+import {SpinalGraphService} from 'spinal-env-viewer-graph-service';
 const extentionCreated = SpinalForgeExtention.createExtention({
   name: "endpoint_chart_viewer",
   vueMountComponent: Vue.extend(aVueCompoment),
@@ -70,7 +71,15 @@ class EndpointChartViewerBtn extends SpinalContextApp {
   isShown(option) {
     if (option && option.selectedNode && option.selectedNode.type &&
       option.selectedNode.type.get() === "BmsEndpoint") {
+      const relNames = SpinalGraphService.getRelationNames(option.selectedNode.id.get());
+      for (let id = 0; id < relNames.length; id++) {
+        const element = relNames[id];
+        if (element === "hasTimeSeries") {
+          return Promise.resolve(true);
+        }
+      }
       return Promise.resolve(true);
+
     }
     return Promise.resolve(-1);
   }
