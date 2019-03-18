@@ -89,4 +89,4 @@ class EndpointChartViewerBtn extends SpinalContextApp {
   }
 }
 
-spinalContextMenuService.registerApp("GraphManagerSideBar", new EndpointChartViewerBtn());
+spinalContextMenuService.registerApp("GraphManagerSideBar", new EndpointChartViewerBtn(), [15]);
